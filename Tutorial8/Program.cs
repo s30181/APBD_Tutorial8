@@ -1,3 +1,5 @@
+using Tutorial8;
+using Tutorial8.clients;
 using Tutorial8.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddScoped<ITripsService, TripsService>();
+builder.Services.AddScoped<IClientService, ClientService>();
+builder.Services.AddScoped<DatabaseHelper>();
+builder.Services.AddScoped<ClientValidator>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
