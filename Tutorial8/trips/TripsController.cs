@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Tutorial8.Services;
 
 namespace Tutorial8.Controllers
@@ -19,10 +20,16 @@ namespace Tutorial8.Controllers
         public async Task<IActionResult> GetTrips()
         {
             var trips = await _tripsService.GetAllTrips();
+
+            if (trips.IsNullOrEmpty())
+            {
+                return Empty;
+            }
+            
             return Ok(trips);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetTrip(int id)
         {
             var trip = await _tripsService.GetTripById(id);

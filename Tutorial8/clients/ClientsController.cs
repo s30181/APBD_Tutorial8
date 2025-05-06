@@ -1,4 +1,6 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Tutorial8.clients;
 using Tutorial8.Models.DTOs;
 using Tutorial8.Services;
@@ -23,12 +25,19 @@ public class ClientsController : ControllerBase
     [HttpGet("{id:int}/trips")]
     public async Task<IActionResult> GetClientTrips(int id)
     {
-        if (!(await _clientService.Exists(id)))
+        if (!await _clientService.Exists(id))
         {
             return NotFound("Client not found");
         }
         
-        return Ok(await _tripsService.GetTripsByClient(id));
+        var trips = await _tripsService.GetTripsByClient(id);
+
+        if (trips.IsNullOrEmpty())
+        {
+            return Empty;
+        }
+        
+        return Ok(trips);
     }
     
     [HttpPost("")]
@@ -38,12 +47,16 @@ public class ClientsController : ControllerBase
         {
             await _clientValidator.Validate(createDto);
             var dto = await _clientService.Create(createDto);
-            
+
             return Created($"/api/clients/{dto.Id}", dto);
+        }
+        catch (ValidationException e)
+        {
+            return BadRequest(e.Message);
         }
         catch (Exception e)
         {
-            return BadRequest(e.Message);
+            return StatusCode(500, e.Message);
         }
     }
 
@@ -75,7 +88,7 @@ public class ClientsController : ControllerBase
         
         await _tripsService.PutClientInTrip(tripId, id);
                 
-        return Ok("Client added to trip");
+        return NoContent();
     }
 
     [HttpDelete("{id:int}/trips/{tripId:int}")]
@@ -98,6 +111,6 @@ public class ClientsController : ControllerBase
 
         await _tripsService.DeleteClientFromTrip(tripId, id);
 
-        return Ok("Client removed from trip");
+        return NoContent();
     }
 }

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
 namespace Tutorial8.clients;
@@ -19,7 +20,7 @@ public class ClientValidator
             new Dictionary<string, object> { { "@pesel", createDto.Pesel } });
         if (peselExists == 1)
         {
-            throw new ArgumentException("Pesel already exists");
+            throw new ValidationException("Pesel already exists");
         }
         
         var emailExists = await _databaseHelper.GetScalar<int>(
@@ -27,7 +28,7 @@ public class ClientValidator
             new Dictionary<string, object> { { "@email", createDto.Email } });
         if (emailExists == 1)
         {
-            throw new ArgumentException("Email already exists");
+            throw new ValidationException("Email already exists");
         }
         
         var phoneExists = await _databaseHelper.GetScalar<int>(
@@ -35,7 +36,7 @@ public class ClientValidator
             new Dictionary<string, object> { { "@telephone", createDto.Telephone } });
         if (phoneExists == 1)
         {
-            throw new ArgumentException("Telephone already exists");
+            throw new ValidationException("Telephone already exists");
         }
     }
 }
